@@ -3,9 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Job Application Tracker</title>
+
+  <!-- font style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Outfit:wght@100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- tailwind css -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    *{
+      font-family: "Geist", sans-serif;
+    }
+  </style>
 </head>
-<body>
-  
+<body class="bg-[#F8FAFC]">
+  <header class="w-[80%] mx-auto">
+    <h1 class="text-4xl font-bold text-[#002C5C] pb-5 pt-16">Job Application Tracker</h1>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-[#FFFFFF] p-5 rounded-md border border-gray-100">
+        <p class="font-semibold">Total</p>
+        <p id="total" class="text-[#002C5C] font-bold text-2xl">0</p>
+      </div>
+      <div class="bg-[#FFFFFF] p-5 rounded-md border border-gray-100">
+        <p class="font-semibold">Interview</p>
+        <p id="interview" class="text-[#10B981] font-bold text-2xl">0</p>
+      </div>
+      <div class="bg-[#FFFFFF] p-5 rounded-md border border-gray-100">
+        <p class="font-semibold">Rejected</p>
+        <p id="rejected" class="text-[#EF4444] font-bold text-2xl">0</p>
+      </div>
+    </div>
+  </header>
+
+  <hr class="my-8 text-gray-200">
+
+  <main class="w-[80%] mx-auto">
+    <div>
+      <div class=" flex gap-4">
+        <button id="all-filter-btn" class="bg-gray-300 px-8 py-3 rounded-md">All</button>
+        <button id="interview-filter-btn" class="bg-gray-300 px-8 py-3 rounded-md">Interview</button>
+        <button id="rejected-filter-btn" class="bg-gray-300 px-8 py-3 rounded-md">Rejected</button>
+      </div>
+    </div>
+
+  </main>
 </body>
 </html>
