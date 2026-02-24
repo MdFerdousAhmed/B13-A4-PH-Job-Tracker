@@ -1,108 +1,172 @@
-// Select elements
-const allJobsSection = document.getElementById("allJobs");
-const totalEl = document.getElementById("total");
-const interviewEl = document.getElementById("interview");
-const rejectedEl = document.getElementById("rejected");
-const total1El = document.getElementById("total1");
+(function() {
+      // Get references to key elements
+      const jobsContainer = document.getElementById('allJobs');
+      const emptyState = document.getElementById('emptyState');
+      const totalEl = document.getElementById('total');
+      const total1El = document.getElementById('total1');
+      const interviewEl = document.getElementById('interview');
+      const rejectedEl = document.getElementById('rejected');
 
-const allFilterBtn = document.getElementById("all-filter-btn");
-const interviewFilterBtn = document.getElementById("interview-filter-btn");
-const rejectedFilterBtn = document.getElementById("rejected-filter-btn");
+      // Filter buttons
+      const allBtn = document.getElementById('all-filter-btn');
+      const interviewBtn = document.getElementById('interview-filter-btn');
+      const rejectedBtn = document.getElementById('rejected-filter-btn');
 
-let currentFilter = "all";
+      let currentFilter = 'all';
 
-// Update counters
-function updateCounts() {
-  const jobs = document.querySelectorAll("#allJobs > div");
-  let total = jobs.length;
-  let interview = 0;
-  let rejected = 0;
+      let jobCards = document.querySelectorAll('#allJobs > div');
 
-  jobs.forEach(job => {
-    const statusBtn = job.querySelector("#status");
+      // ---------- Helper Functions ----------
+      function updateStats() {
+        const total = jobCards.length;
+        let interview = 0;
+        let rejected = 0;
 
-    if (statusBtn.innerText === "INTERVIEW") interview++;
-    if (statusBtn.innerText === "REJECTED") rejected++;
-  });
+        jobCards.forEach(card => {
+          const statusBtn = card.querySelector('#status');
+          const status = statusBtn.textContent.trim();
+          if (status === 'INTERVIEW') interview++;
+          if (status === 'REJECTED') rejected++;
+        });
 
-  totalEl.innerText = total;
-  interviewEl.innerText = interview;
-  rejectedEl.innerText = rejected;
-  total1El.innerHTML = `${total} <span>jobs</span>`;
-}
+        totalEl.textContent = total;
+        total1El.innerHTML = `${total} <span>jobs</span>`;
+        interviewEl.textContent = interview;
+        rejectedEl.textContent = rejected;
+      }
 
-// Change status
-function setupStatusButtons() {
-  const jobs = document.querySelectorAll("#allJobs > div");
+      function filterJobs(filter) {
+        let visibleCount = 0;
 
-  jobs.forEach(job => {
-    const interviewBtn = job.querySelector(".interview-btn");
-    const rejectedBtn = job.querySelector(".rejected-btn");
-    const statusBtn = job.querySelector("#status");
+        jobCards.forEach(card => {
+          const statusBtn = card.querySelector('#status');
+          const status = statusBtn.textContent.trim();
 
-    interviewBtn.addEventListener("click", () => {
-      statusBtn.innerText = "INTERVIEW";
-      statusBtn.className = "btn btn-soft btn-success";
-      updateCounts();
-    });
+          if (filter === 'all') {
+            card.style.display = 'flex';
+            visibleCount++;
+          } else if (filter === 'interview' && status === 'INTERVIEW') {
+            card.style.display = 'flex';
+            visibleCount++;
+          } else if (filter === 'rejected' && status === 'REJECTED') {
+            card.style.display = 'flex';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
 
-    rejectedBtn.addEventListener("click", () => {
-      statusBtn.innerText = "REJECTED";
-      statusBtn.className = "btn btn-soft btn-error";
-      updateCounts();
-    });
-  });
-}
+        // Show/hide empty state
+        if (visibleCount === 0) {
+          emptyState.classList.remove('hidden');
+          emptyState.classList.add('flex');
+          jobsContainer.classList.add('hidden');
+        } else {
+          emptyState.classList.add('hidden');
+          emptyState.classList.remove('flex');
+          jobsContainer.classList.remove('hidden');
+        }
+      }
 
-// Delete job
-function setupDeleteButtons() {
-  const deleteBtns = document.querySelectorAll(".fa-trash-can");
+      function updateButtonStyles() {
+        // Reset all buttons to default style
+        allBtn.className = 'btn text-gray-400 px-8 py-3';
+        interviewBtn.className = 'btn text-gray-400 px-8 py-3';
+        rejectedBtn.className = 'btn text-gray-400 px-8 py-3';
 
-  deleteBtns.forEach(btn => {
-    btn.parentElement.addEventListener("click", () => {
-      btn.closest("#allJobs > div").remove();
-      updateCounts();
-    });
-  });
-}
+        // Set active button style
+        let activeBtn = allBtn;
+        if (currentFilter === 'interview') activeBtn = interviewBtn;
+        if (currentFilter === 'rejected') activeBtn = rejectedBtn;
+        activeBtn.className = 'btn btn-info text-white px-8 py-3';
+      }
 
-// Filter function
-function toggleStyle(buttonId) {
-  currentFilter = buttonId;
+      function refreshAndFilter() {
+        jobCards = document.querySelectorAll('#allJobs > div');
+        updateStats();
+        filterJobs(currentFilter);
+      }
 
-  // Reset all buttons
-  [allFilterBtn, interviewFilterBtn, rejectedFilterBtn].forEach(btn => {
-    btn.classList.remove("btn-info", "text-white");
-    btn.classList.add("text-gray-400");
-  });
+      // ---------- Action Handlers ----------
+      function changeStatus(card, newStatus) {
+        const statusBtn = card.querySelector('#status');
+        statusBtn.textContent = newStatus;
+        // Update button class for styling
+        if (newStatus === 'INTERVIEW') {
+          statusBtn.className = 'btn btn-soft btn-success';
+        } else if (newStatus === 'REJECTED') {
+          statusBtn.className = 'btn btn-soft btn-error';
+        } else {
+          statusBtn.className = 'btn btn-soft btn-primary';
+        }
 
-  // Active button style
-  const activeBtn = document.getElementById(buttonId);
-  activeBtn.classList.add("btn-info", "text-white");
-  activeBtn.classList.remove("text-gray-400");
+        refreshAndFilter(); 
+      }
 
-  applyFilter();
-}
+      function deleteJob(card) {
+        card.remove();
+        refreshAndFilter(); 
+      }
 
-// Apply filter
-function applyFilter() {
-  const jobs = document.querySelectorAll("#allJobs > div");
+      // ---------- Event Handlers ----------
+      function handleInterview(e) {
+        e.preventDefault();
+        const card = e.currentTarget.closest('#allJobs > div');
+        if (card) changeStatus(card, 'INTERVIEW');
+      }
 
-  jobs.forEach(job => {
-    const status = job.querySelector("#status").innerText;
+      function handleRejected(e) {
+        e.preventDefault();
+        const card = e.currentTarget.closest('#allJobs > div');
+        if (card) changeStatus(card, 'REJECTED');
+      }
 
-    if (currentFilter === "all-filter-btn") {
-      job.style.display = "flex";
-    } else if (currentFilter === "interview-filter-btn") {
-      job.style.display = status === "INTERVIEW" ? "flex" : "none";
-    } else if (currentFilter === "rejected-filter-btn") {
-      job.style.display = status === "REJECTED" ? "flex" : "none";
-    }
-  });
-}
+      function handleDelete(e) {
+        e.preventDefault();
+        const card = e.currentTarget.closest('#allJobs > div');
+        if (card) deleteJob(card);
+      }
 
-// Initialize
-setupStatusButtons();
-setupDeleteButtons();
-updateCounts();
+      // Attach event listeners to all interactive elements
+      function attachEventListeners() {
+        // INTERVIEW buttons
+        document.querySelectorAll('.interview-btn').forEach(btn => {
+          btn.removeEventListener('click', handleInterview);
+          btn.addEventListener('click', handleInterview);
+        });
 
+        // REJECTED buttons
+        document.querySelectorAll('.rejected-btn').forEach(btn => {
+          btn.removeEventListener('click', handleRejected);
+          btn.addEventListener('click', handleRejected);
+        });
+
+        // Trash buttons (delete)
+        document.querySelectorAll('.fa-trash-can').forEach(icon => {
+          const deleteBtn = icon.closest('button');
+          if (deleteBtn) {
+            deleteBtn.removeEventListener('click', handleDelete);
+            deleteBtn.addEventListener('click', handleDelete);
+          }
+        });
+      }
+
+      window.toggleStyle = function(buttonId) {
+        if (buttonId === 'all-filter-btn') currentFilter = 'all';
+        else if (buttonId === 'interview-filter-btn') currentFilter = 'interview';
+        else if (buttonId === 'rejected-filter-btn') currentFilter = 'rejected';
+
+        updateButtonStyles();
+        filterJobs(currentFilter);
+      };
+
+      function init() {
+        currentFilter = 'all';
+        updateButtonStyles();
+        refreshAndFilter();
+        attachEventListeners();
+      }
+
+      // Run when page is fully loaded
+      window.addEventListener('DOMContentLoaded', init);
+    })();
